@@ -26,13 +26,13 @@ jobs:
       matrix:
         include:
           - target: 'ramips-mt7621'
-            sdk_image: 'immortalwrt/sdk:ramips-mt7621-23.05.4'
+            sdk_image: 'openwrt/sdk:ramips-mt7621-23.05.5'
             arch: 'mipsel_24kc'
           - target: 'mediatek-filogic'
-            sdk_image: 'immortalwrt/sdk:mediatek-filogic-23.05.4'
+            sdk_image: 'openwrt/sdk:mediatek-filogic-23.05.5'
             arch: 'aarch64_cortex-a53'
           - target: 'x86-64'
-            sdk_image: 'immortalwrt/sdk:x86-64-23.05.4'
+            sdk_image: 'openwrt/sdk:x86-64-23.05.5'
             arch: 'x86_64'
 
     steps:
@@ -45,8 +45,8 @@ jobs:
         run: |
           mkdir -p output
           docker run --rm -u 0:0 \
-            -v "$GITHUB_WORKSPACE/package-src:/home/build/immortalwrt/package/minieap" \
-            -v "$GITHUB_WORKSPACE/output:/home/build/immortalwrt/bin" \
+            -v "$GITHUB_WORKSPACE/package-src:/home/build/openwrt/package/minieap" \
+            -v "$GITHUB_WORKSPACE/output:/home/build/openwrt/bin" \
             ${{ matrix.sdk_image }} \
             /bin/bash -c "make defconfig && make package/minieap/compile V=s -j\$(nproc)"
 
