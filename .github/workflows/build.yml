@@ -1,0 +1,83 @@
+name: Build MiniEAP IPK
+
+on:
+  push:
+    tags:
+      - 'v*'
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+  workflow_dispatch:
+    inputs:
+      openwrt_version:
+        description: 'OpenWrt/ImmortalWrt Version'
+        required: true
+        default: '23.05.4'
+
+jobs:
+  build:
+    name: Build for ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: 'ramips-mt7621'
+            sdk_image: 'immortalwrt/sdk:ramips-mt7621-23.05.4'
+            arch: 'mipsel_24kc'
+          - target: 'mediatek-filogic'
+            sdk_image: 'immortalwrt/sdk:mediatek-filogic-23.05.4'
+            arch: 'aarch64_cortex-a53'
+          - target: 'x86-64'
+            sdk_image: 'immortalwrt/sdk:x86-64-23.05.4'
+            arch: 'x86_64'
+
+    steps:
+      - name: Checkout package source
+        uses: actions/checkout@v4
+        with:
+          path: package-src
+
+      - name: Build IPK in Docker SDK
+        run: |
+          mkdir -p output
+          docker run --rm -u 0:0 \
+            -v "$GITHUB_WORKSPACE/package-src:/home/build/immortalwrt/package/minieap" \
+            -v "$GITHUB_WORKSPACE/output:/home/build/immortalwrt/bin" \
+            ${{ matrix.sdk_image }} \
+            /bin/bash -c "make defconfig && make package/minieap/compile V=s -j\$(nproc)"
+
+      - name: Collect IPK artifacts
+        run: |
+          mkdir -p dist
+          find output -type f -name "minieap*.ipk" -exec cp -v {} dist/ \;
+          ls -la dist/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: minieap-${{ matrix.target }}
+          path: dist/*.ipk
+
+  release:
+    name: Create Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-ipks
+
+      - name: Prepare Release Assets
+        run: |
+          mkdir -p release-assets
+          find all-ipks -type f -name "*.ipk" -exec cp -v {} release-assets/ \;
+          ls -la release-assets/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*.ipk
+          generate_release_notes: true

@@ -99,7 +99,7 @@ proto_minieap_setup() {
 	append_setting ${fake_serial:+fake-serial="$fake_serial"}
 	append_setting ${max_dhcp_count:+max-dhcp-count=$max_dhcp_count}
 
-	network_is_up wan || (echo "wan is not ready, sleep 10s." >&2; sleep 10)
+	network_is_up "$config" >/dev/null 2>&1 || (echo "$config device is initializing, waiting 2s..." >&2; sleep 2)
 
 	proto_export "INTERFACE=$config"
 	proto_run_command "$config" minieap --conf-file "$config_file"
