@@ -2,6 +2,9 @@ name: Build MiniEAP IPK
 
 on:
   push:
+    branches:
+      - dev
+      - main
     tags:
       - 'v*'
     paths-ignore:

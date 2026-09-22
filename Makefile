@@ -11,7 +11,7 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/minieap-$(PKG_VERSION)
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/Railgun-wiki/minieap-sysu.git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE_VERSION:=v$(PKG_VERSION)
+PKG_SOURCE_VERSION:=dev
 
 include $(INCLUDE_DIR)/package.mk
 
