@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=minieap
 PKG_VERSION:=0.94.2
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 PKG_MAINTAINER:=Railgun-wiki <64968531+Railgun-wiki@users.noreply.github.com>
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=LICENSE
